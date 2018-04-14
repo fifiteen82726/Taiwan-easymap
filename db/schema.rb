@@ -11,12 +11,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180412154052) do
+ActiveRecord::Schema.define(version: 20180414203519) do
 
-  create_table "regions", force: :cascade do |t|
+  create_table "maps", force: :cascade do |t|
+    t.string   "city",       limit: 255
     t.string   "city_s",     limit: 255
-    t.string   "name",       limit: 255
-    t.string   "symbol",     limit: 255
+    t.string   "state",      limit: 255
+    t.string   "state_s",    limit: 255
+    t.string   "road",       limit: 255
+    t.string   "road_s",     limit: 255
+    t.string   "office",     limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end

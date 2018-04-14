@@ -1,0 +1,34 @@
+市 已知
+
+區 = 基隆市 打 API  http://easymap.land.moi.gov.tw/R02/City_json_getTownList
+
+cityCode: A
+cityName: 臺北市
+doorPlateType: A
+
+
+
+基隆市 ＋ 區 打 API ＝ office
+http://easymap.land.moi.gov.tw/R02/City_json_getSectionList
+
+cityCode: A
+area: 10
+
+
+office + 段號 + 路號 打 API ＝ xy
+http://easymap.land.moi.gov.tw/R02/Map_json_getMapCenter
+office: AC
+sectNo: 0513
+landNo: 1
+qryResult:
+
+
+
+基隆市 C
+
+
+
+region
+
+台北市 台北市代號 中山區 中山區數字 路名 路名數字 office
+city city_s state state_s road road_s office

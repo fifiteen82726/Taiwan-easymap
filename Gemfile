@@ -23,10 +23,14 @@ gem 'jbuilder', '~> 2.0'
 # bundle exec rake doc:rails generates the API under doc/api.
 gem 'sdoc', '~> 0.4.0', group: :doc
 
-gem 'pry', '~> 0.10.4'
-gem 'pry-rails', '~> 0.3.4'
+
+
 gem 'awesome_print', '~> 1.7.0'
 gem 'httparty'
+
+gem 'pry'
+gem 'pry-rails', '~> 0.3.4'
+gem 'pry-byebug'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'

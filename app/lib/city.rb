@@ -28,13 +28,43 @@ class City
 
   URL = 'http://easymap.land.moi.gov.tw/R02/Map_json_getMapCenter'
 
+  CITY_STATE_HASH = {}
+
   def read_csv
     path = './testcase.csv'
     csv_data = CSV.read(path, headers: true, skip_lines: /\A(,)+\z/)
 
+    aleady_map = []
+
     csv_data.each do |row|
-      binding.pry
-      # row['AA45']
+      city_name = row['AA45']
+      next if aleady_map.include?(city_name.strip)
+      state_name = row['AA46'].strip
+      road = row['AA48']
+
+      city_s = CITY[city_name]
+      if CITY_STATE_HASH[city_s].nil?
+        state_list = HTTParty.post('http://easymap.land.moi.gov.tw/R02/City_json_getTownList', body: {cityCode: city_s, cityName: CITY[city_name], doorPlateType: 'A'})
+        state_road_hadsh = {}
+        state_list.each do |state_obj|
+          road_list = HTTParty.post('http://easymap.land.moi.gov.tw/R02/City_json_getSectionList', body: {cityCode: city_s, area: state_obj['id'] })
+          road_list.each do |road|
+            Map.create(
+              city: city_name,
+              city_s: city_s,
+              state: state_name,
+              state_s: state_obj[
+
+            )
+
+             state: string, state_s: string, road: string, road_s: string, office: string, created_at: datetime, updated_at: datetime)
+          end
+
+# cityCode: A
+# area: 10
+
+        end
+      end
     end
 
   end
