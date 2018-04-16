@@ -31,45 +31,37 @@ class City
   CITY_STATE_HASH = {}
 
   def read_csv
-    path = './testcase.csv'
+    path = './city-xy.csv'
     csv_data = CSV.read(path, headers: true, skip_lines: /\A(,)+\z/)
 
     aleady_map = []
+    city_to_state_list = {}
 
     csv_data.each do |row|
       city_name = row['AA45']
       next if aleady_map.include?(city_name.strip)
-      state_name = row['AA46'].strip
-      road = row['AA48']
 
       city_s = CITY[city_name]
       if CITY_STATE_HASH[city_s].nil?
-        state_list = HTTParty.post('http://easymap.land.moi.gov.tw/R02/City_json_getTownList', body: {cityCode: city_s, cityName: CITY[city_name], doorPlateType: 'A'})
-        state_road_hadsh = {}
+        state_list = city_to_state_list[city_s] ||= HTTParty.post('http://easymap.land.moi.gov.tw/R02/City_json_getTownList', body: {cityCode: city_s, cityName: CITY[city_name], doorPlateType: 'A'})
         state_list.each do |state_obj|
+          next if aleady_map.include?("#{city_name}_#{state_obj['name']}")
           road_list = HTTParty.post('http://easymap.land.moi.gov.tw/R02/City_json_getSectionList', body: {cityCode: city_s, area: state_obj['id'] })
           road_list.each do |road|
-            Map.create(
+            Map.find_or_create_by(
               city: city_name,
               city_s: city_s,
-              state: state_name,
-              state_s: state_obj[
-
+              state: state_obj['name'],
+              state_s: state_obj['id'],
+              road: road['name'],
+              road_s: road['id'],
+              office: road['officeCode'],
             )
-
-             state: string, state_s: string, road: string, road_s: string, office: string, created_at: datetime, updated_at: datetime)
           end
 
-# cityCode: A
-# area: 10
-
+          aleady_map.push "#{city_name}_#{state_obj['name']}"
         end
       end
     end
-
   end
-
-  # def query(city, region, section, number)
-  #   response = HTTParty.post(URL, body: {'office' => 'AC', 'sectNo' => '0400', 'landNo' => '1'})
-  # end
 end
