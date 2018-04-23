@@ -1,6 +1,7 @@
 require 'csv'
 
 class City
+
   CITY = {
     '基隆市' => 'C',
     '臺北市' => 'A',
@@ -27,6 +28,8 @@ class City
   }.freeze
 
   URL = 'http://easymap.land.moi.gov.tw/R02/Map_json_getMapCenter'
+
+  REGEXP = /(\d+)(0{3})(\d+)/
 
   CITY_STATE_HASH = {}
 
@@ -62,6 +65,20 @@ class City
           aleady_map.push "#{city_name}_#{state_obj['name']}"
         end
       end
+    end
+  end
+
+  # 10000 => 1-0
+  # 100000 => 10-0
+  # 310000 => 31-0
+  # 310001 => 31-1
+  # 1200000 => 120-0
+  # 1200009 => 120-9
+  # 12000011 => 120-11
+  def to_land_number(row_number)
+    row_number.gsub(REGEXP) do |match_object|
+      return "#{$1}-#{$3}" if $3 != '0'
+      return $1
     end
   end
 end
