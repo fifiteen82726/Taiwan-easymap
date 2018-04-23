@@ -95,20 +95,27 @@ class City
     csv_data = get_csv_data
     CSV.open('new_testcase.csv', 'w') do |csv|
       csv << %w[AA45 AA46 AA48 AA49 AA16 AA17 AREA(m2) X Y]
+      map_list_hash = {}
       csv_data.each do |row|
         begin
           next if row['X'].present? && row['Y'].present?
-          map = Map.find_by(
-            city: row['AA45'].strip,
-            state: row['AA46'].strip,
-            road: row['AA48'].strip,
-          )
+          city = row['AA45'].strip
+          state = row['AA46'].strip
+          road = row['AA48'].strip
 
-          response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s,landNo: to_land_number(row['AA49'].strip)})
+          if (map = map_list_hash["{city_state_road}"]).nil?
+            map = map_list_hash["{city_state_road}"] = Map.find_by(
+              city: city,
+              state: state,
+              road: road,
+            )
+          end
+
+          response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s, landNo: to_land_number(row['AA49'].strip)})
           csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], response['X'], response['Y']]
 
         rescue Exception => e
-          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'],nil,nil]
+          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], nil, nil]
         end
       end
     end
