@@ -27,15 +27,19 @@ class City
     '連江縣' => 'Z'
   }.freeze
 
-  URL = 'http://easymap.land.moi.gov.tw/R02/Map_json_getMapCenter'
+  XY_URL = 'http://easymap.land.moi.gov.tw/R02/Map_json_getMapCenter'
 
   REGEXP = /(\d+)(0{3})(\d+)/
 
   CITY_STATE_HASH = {}
 
-  def read_csv
+  def self.get_csv_data(path = './city-xy.csv')
+    CSV.read(path, headers: true, skip_lines: /\A(,)+\z/)
+  end
+
+  def self.save_map_record
     path = './city-xy.csv'
-    csv_data = CSV.read(path, headers: true, skip_lines: /\A(,)+\z/)
+    csv_data = get_csv_data
 
     aleady_map = []
     city_to_state_list = {}
@@ -75,10 +79,38 @@ class City
   # 1200000 => 120-0
   # 1200009 => 120-9
   # 12000011 => 120-11
-  def to_land_number(row_number)
+  def self.to_land_number(row_number)
     row_number.gsub(REGEXP) do |match_object|
       return "#{$1}-#{$3}" if $3 != '0'
       return $1
+    end
+  end
+
+  # office: CC
+  # sectNo: 0029
+  # landNo: 1
+
+  def self.read_csv_and_send_xy_query
+    # csv_data = get_csv_data('testcase.csv')
+    csv_data = get_csv_data
+    CSV.open('new_testcase.csv', 'w') do |csv|
+      csv << %w[AA45 AA46 AA48 AA49 AA16 AA17 AREA(m2) X Y]
+      csv_data.each do |row|
+        begin
+          next if row['X'].present? && row['Y'].present?
+          map = Map.find_by(
+            city: row['AA45'].strip,
+            state: row['AA46'].strip,
+            road: row['AA48'].strip,
+          )
+
+          response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s,landNo: to_land_number(row['AA49'].strip)})
+          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], response['X'], response['Y']]
+
+        rescue Exception => e
+          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'],nil,nil]
+        end
+      end
     end
   end
 end
