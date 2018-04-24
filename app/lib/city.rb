@@ -112,10 +112,33 @@ class City
           end
 
           response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s, landNo: to_land_number(row['AA49'].strip)})
-          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], response['X'], response['Y']]
+          if response.nil?
+            response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s, landNo: to_land_number(row['AA49'].strip)})
+            if response.nil?
+              response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s, landNo: to_land_number(row['AA49'].strip)})
+            end
+          end
+
+          if response.present? && response['X'].present?
+            csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], response['X'], response['Y']]
+          else
+            csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], 'Undefined', 'Undefined']
+          end
 
         rescue Exception => e
-          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], '', '']
+          response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s, landNo: to_land_number(row['AA49'].strip)})
+          if response.nil?
+            response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s, landNo: to_land_number(row['AA49'].strip)})
+            if response.nil?
+              response = HTTParty.post(XY_URL, body: {office: map.office,sectNo: map.road_s, landNo: to_land_number(row['AA49'].strip)})
+            end
+          end
+
+          if response.present?
+            csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], response['X'], response['Y']]
+          else
+            csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], 'Undefined', 'Undefined']
+          end
         end
       end
     end
