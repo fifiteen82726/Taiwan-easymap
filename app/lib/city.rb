@@ -115,7 +115,7 @@ class City
           csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], response['X'], response['Y']]
 
         rescue Exception => e
-          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], nil, nil]
+          csv << [row['AA45'], row['AA46'], row['AA48'], row['AA49'], row['AA16'], row['AA17'], row['AREA(m2)'], '', '']
         end
       end
     end
